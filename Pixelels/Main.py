@@ -1,14 +1,14 @@
 import pygame, sys, math
 from pygame.locals import *
 
-#key I, G, R, L, W, S, C
+#key I, G, R, L, W, S, C, P, Q
 
 Picture = pygame.image.load("Parrots.jpeg")
 
 Running = True
 pygame.init()
 
-Width = 850   #Change these depending on the picture
+Width = 850  #Change these depending on the picture
 Height = 480
 
 Screen = pygame.display.set_mode((Width, Height))
@@ -196,7 +196,7 @@ def CloseEnough(Colour):
             CurrentColour = (Red, Green, Blue)
             CloseBrown = False
 
-            CloseBrown = ColourDistanceCheck(CurrentColour,Colour, 150)
+            CloseBrown = ColourDistanceCheck(CurrentColour,Colour, 100)
 
             if CloseBrown:
                 PXArray[X, Y] = ((Red / 2), Green, Blue)
@@ -235,6 +235,31 @@ def ColourPolz(Colour,ColourVariance):
         else:
             ColourCounter = ColourCounter - ColourVariance
 
+#Sepia
+
+def SepiaTint():
+    GreyScale()
+    for X in xrange (Width):
+        for Y in xrange (Height):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
+
+            if Red <63:
+                Red = Red * 1.1
+                Blue = Blue * 0.9
+            if Red > 62 and Red <192:
+                Red = Red * 1.15
+                Blue = Blue * 0.85
+            if Red > 191:
+                Red = Red * 1.08
+                if Red > 255:
+                    Red = 255
+                Blue = Blue *0.93
+            PXArray[X, Y] = (Red, Green, Blue)
+    pygame.display.update()
+
+
 #Press the keys and it does stuff
 
 while Running:
@@ -258,7 +283,9 @@ while Running:
         if event.type == KEYDOWN and event.key == K_c:
             CloseEnough(Brown) # Can choose any colour
         if event.type == KEYDOWN and event.key == K_p:
-            Posterize(3)  # Try changing the value to alter the amount of posterization
+            Posterize(2)  # Try changing the value to alter the amount of posterization
+        if event.type == KEYDOWN and event.key == K_q:
+            SepiaTint()
 pygame.quit()
 sys.exit()
 
