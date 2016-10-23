@@ -8,8 +8,8 @@ Picture = pygame.image.load("Parrots.jpeg")
 Running = True
 pygame.init()
 
-Width = 850  #Change these depending on the picture
-Height = 480
+Width = 1280  #Change these depending on the picture
+Height = 720
 
 Screen = pygame.display.set_mode((Width, Height))
 Picture =pygame.transform.scale(Picture, (Width,Height))   #Scales the picture to fit the screen
@@ -259,6 +259,31 @@ def SepiaTint():
             PXArray[X, Y] = (Red, Green, Blue)
     pygame.display.update()
 
+#Detects the edges
+
+def DrawEdges():
+    for X in xrange (Width - 1):
+        for Y in xrange (Height - 1):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
+
+            PixelSum = (Red + Green + Blue)
+
+            Red2 = Screen.get_at((X + 1, Y )).r
+            Green2 = Screen.get_at((X + 1, Y )).g
+            Blue2 = Screen.get_at((X + 1, Y)).b
+
+            NextPixelSum = (Red2 + Green2 + Blue2)
+            Difference = NextPixelSum - PixelSum
+
+            if Difference < 0:
+                Difference = Difference * - 1
+            if Difference > 255:
+                Difference = 255
+            Difference = 255 - Difference
+            PXArray[X, Y] = (Difference, Difference, Difference)
+    pygame.display.update()
 
 #Press the keys and it does stuff
 
@@ -286,6 +311,8 @@ while Running:
             Posterize(2)  # Try changing the value to alter the amount of posterization
         if event.type == KEYDOWN and event.key == K_q:
             SepiaTint()
+        if event.type == KEYDOWN and event.key == K_e:
+            DrawEdges()
 pygame.quit()
 sys.exit()
 
