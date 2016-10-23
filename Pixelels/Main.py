@@ -1,9 +1,11 @@
 import pygame, sys, math
 from pygame.locals import *
 
-#key I, G, R, L, W, S, C, P, Q, E, K
+#key I, G, R, L, W, S, C, P, Q, E, K, Z, F, X
+#Pretty much most the keyboard now
+#Look at the end to see what key relates to which function
 
-Picture = pygame.image.load("Parrots.Jpeg")
+Picture = pygame.image.load("Parrots.jpeg") #Just change the image name to use different images
 
 Running = True
 pygame.init()
@@ -20,7 +22,7 @@ PXArray = pygame.PixelArray(Screen)
 
 White = (255, 255, 255)
 Black = (0,0,0)
-Brown = (150, 80, 50)
+Brown = (150, 80, 50)    #Defined some colours for later use
 
 #Inverts the colours
 def Invert():
@@ -38,8 +40,6 @@ def Invert():
 
             PXArray[X, Y] = (Red, Green, Blue)
 
-    pygame.display.update()
-
 #Greyscale
 def GreyScale():
 
@@ -53,8 +53,6 @@ def GreyScale():
 
             PXArray[X, Y] = (grey, grey, grey)
 
-    pygame.display.update()
-
 #halves all the red values
 def LessRed():
 
@@ -65,8 +63,6 @@ def LessRed():
             Blue = Screen.get_at((X, Y)).b
 
             PXArray[X, Y] = (Red/2, Green, Blue)
-
-    pygame.display.update()
 
 #does weird stuff, dont trust this one
 def ColourTest():
@@ -92,7 +88,6 @@ def ColourTest():
             Gradient = -1.25
         elif ColourChange == 0:
             Gradient = 1.25
-    pygame.display.update()
 
 #Somehow it makes a wood texture or otherstuff but still looks good, dont ask how
 def WoodTex():
@@ -132,8 +127,6 @@ def WoodTex():
                 Blue = 0
             PXArray[X, Y] = (Red, Green, Blue)
 
-    pygame.display.update()
-
 #2spooky5u white fade ghostly effect
 def Spooky():
     ColourChange = 0
@@ -169,8 +162,6 @@ def Spooky():
                 Blue = 0
             PXArray[X, Y] = (Red, Green, Blue)
 
-    pygame.display.update()
-
 #Checks the distance between two colours, if the colours are within the tolerance it will return true
 def ColourDistanceCheck(Colour1, Colour2, Tolerance):
 
@@ -183,7 +174,7 @@ def ColourDistanceCheck(Colour1, Colour2, Tolerance):
    else:
        return False
 
-#if A pixel is close to input Colour (brown) it will half the red value of that pixel
+#if A pixel is close to input Colour (set to brown currently) it will half the red value of that pixel
 def CloseEnough(Colour):
     for Y in range(0, Height):
         for X in range(0, Width):
@@ -202,8 +193,6 @@ def CloseEnough(Colour):
             else:
                 PXArray[X, Y] = (Red, Green, Blue)
 
-    pygame.display.update()
-
 #Posterizes the picture, level of Posterizsation depends on the ColourVariance
 def Posterize(ColourVariance):
     ColourVariance = (255 / ColourVariance)
@@ -219,7 +208,6 @@ def Posterize(ColourVariance):
             Blue = ColourPolz(Blue, ColourVariance)
 
             PXArray[X, Y] = (Red, Green, Blue)
-    pygame.display.update()
 
 #Posterizes each colour, Used in the Posterize function
 def ColourPolz(Colour,ColourVariance):
@@ -253,9 +241,8 @@ def SepiaTint():
                     Red = 255
                 Blue = Blue *0.93
             PXArray[X, Y] = (Red, Green, Blue)
-    pygame.display.update()
 
-#Detects the edges
+#Draws the edges
 def DrawEdges():
     for X in xrange (Width - 1):
         for Y in xrange (Height - 1):
@@ -278,10 +265,9 @@ def DrawEdges():
                 Difference = 255
             Difference = 255 - Difference
             PXArray[X, Y] = (Difference, Difference, Difference)
-    pygame.display.update()
 
-#Draws the edges but in colour
-def DrawOutlineColour():
+#Variation on DrawEdges draws the edges but in colour, doesnt work well on some images. try it on parrot
+def DrawEdgesColour():
     for X in xrange (Width - 1):
         for Y in xrange (Height - 1):
             Red = Screen.get_at((X, Y)).r
@@ -316,9 +302,8 @@ def DrawOutlineColour():
 
 
             PXArray[X, Y] = (Red, Green, Blue)
-    pygame.display.update()
 
-#Kinda cell shades it, wip
+#Kinda cell shades it, work in progress, press multiple times for thicker lines
 def CelShadeSorta():
     for X in xrange(Width - 1):
         for Y in xrange(Height - 1):
@@ -352,7 +337,79 @@ def CelShadeSorta():
                 Blue = 0
 
             PXArray[X, Y] = (Red, Green, Blue)
-    pygame.display.update()
+
+#RainbowMatrixStyle. looks cool, made by accident
+def RainbowMatrixStyle (Tolerance):
+    Counter = 0
+    for X in xrange(Width):
+        for Y in xrange(Height):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
+
+            Colour = (Red + Blue + Green)/3
+
+            if Colour > Tolerance:
+                Counter = Counter + 1
+            if Counter == 3:
+                Counter = 0
+            if Counter == 0:
+                PXArray[X, Y] = (Red, 0, 0)
+            elif Counter == 1:
+                PXArray[X, Y] = (0, Green, 0)
+            elif Counter == 2:
+                PXArray[X, Y] = (0, 0, Blue)
+
+#Variation on RainbowMatrix where it fills a lot of the blanks
+def RainbowMatrixStyleFill():
+    RainbowMatrixStyle(80)  #Remember to change this, 80 is good number for parrot
+    for Y in xrange(Height):
+        for X in xrange(Width):
+            Counter = 0
+            ColourNotFound = True
+            while ColourNotFound:
+                if X - Counter >= 0:
+                    Red = Screen.get_at((X - Counter, Y)).r
+                    Green = Screen.get_at((X - Counter, Y)).g
+                    Blue = Screen.get_at((X - Counter, Y)).b
+
+                    Colour = (Red + Green + Blue)/3
+                    if Colour < 25: # This number can change a lot, wouldnt go higher than 50 though
+                        Counter = Counter + 1
+                    else:
+                        ColourNotFound = False
+                else:
+                    ColourNotFound = False
+            while Counter > 0:
+
+                if X - Counter >= 0:
+                    PXArray[X - Counter, Y] = (Red, Green, Blue)
+                Counter = Counter - 1
+
+#Accidently made this one. Another variation of RainbowMatrixStyle, cool effect so decided to keep it
+def RainbowMatrixStyleZ():
+    RainbowMatrixStyle(80)   #Remember to change this, 80 is good number for parrot
+    for Y in xrange(Height):
+        for X in xrange(Width):
+            Counter = 0
+            ColourNotFound = True
+            while ColourNotFound:
+                if X - Counter >= 0:
+                    Red = Screen.get_at((X - Counter, Y)).r
+                    Green = Screen.get_at((X - Counter, Y)).g
+                    Blue = Screen.get_at((X - Counter, Y)).b
+
+                    Colour = (Red + Green + Blue)/3
+                    if Colour > 30:  # This number can change a lot, wouldnt go higher than 50 though
+                        Counter = Counter + 4  #Changing this number does fun stuff (0-5 reconmended)
+
+                while Counter > 0:
+
+                    if X - Counter >= 0:
+                        PXArray[X - Counter, Y] = (Red, Green, Blue)
+                    Counter = Counter - 1
+                else:
+                    ColourNotFound = False
 
 #Press the keys and it does stuff
 while Running:
@@ -374,7 +431,7 @@ while Running:
         if event.type == KEYDOWN and event.key == K_s:
             Spooky()
         if event.type == KEYDOWN and event.key == K_c:
-            CloseEnough(Brown) # Can choose any colour
+            CloseEnough(Brown) # Can choose any colour using RGB value
         if event.type == KEYDOWN and event.key == K_p:
             Posterize(3)  # Try changing the value to alter the amount of posterization
         if event.type == KEYDOWN and event.key == K_q:
@@ -382,9 +439,16 @@ while Running:
         if event.type == KEYDOWN and event.key == K_e:
             DrawEdges()
         if event.type == KEYDOWN and event.key == K_k:
-            DrawOutlineColour()
+            DrawEdgesColour()
         if event.type == KEYDOWN and event.key == K_x:
             CelShadeSorta()
+        if event.type == KEYDOWN and event.key == K_m:
+            RainbowMatrixStyle(80)  #Tolerance, value between 0 and 255. 80 is good number for parrot
+        if event.type == KEYDOWN and event.key == K_f:
+            RainbowMatrixStyleFill()
+        if event.type == KEYDOWN and event.key == K_z:
+            RainbowMatrixStyleZ()
+        pygame.display.update()
 pygame.quit()
 sys.exit()
 
