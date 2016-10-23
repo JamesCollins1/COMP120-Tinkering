@@ -9,85 +9,70 @@ Running = True
 pygame.init()
 
 Width = 400
-Height = 536
-screen = pygame.display.set_mode((Width, Height))
+Height = 500
 
-screen.blit(Picture, (0, 0))
+Screen = pygame.display.set_mode((Width, Height))
+Picture =pygame.transform.scale(Picture, (Width,Height))
+Screen.blit(Picture, (0, 0))
 pygame.display.update()
-pxarray2 = pygame.PixelArray(screen)
-pxarray = pygame.PixelArray(screen)
+
+PXArray2 = pygame.PixelArray(Screen)
+PXArray = pygame.PixelArray(Screen)
 
 #Inverts the colours
 def Invert():
-    y = 0
 
-    for x in xrange (Width):
-        X = 0
-        for x in xrange (Height):
-            RGBint = pxarray[y,X]
-            Blue = RGBint & 255
-            Green = (RGBint >> 8) & 255
-            Red = (RGBint >> 16) & 255
+    for Y in range(0, Height):
+        for X in range(0, Width):
 
-            Blue = 255 - Blue
-            Green = 255 - Green
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
+
             Red = 255 - Red
+            Green = 255 - Green
+            Blue = 255 - Blue
 
-            pxarray[y, X] = (Red, Green, Blue)
-            X = X + 1
-        y = y + 1
+            PXArray[X, Y] = (Red, Green, Blue)
 
     pygame.display.update()
 
 #Greyscale
 def GreyScale():
-    y = 0
 
-    for x in xrange(Width):
-        X = 0
-        for x in xrange(Height):
-            RGBint = pxarray[y, X]
-            Blue = RGBint & 255
-            Green = (RGBint >> 8) & 255
-            Red = (RGBint >> 16) & 255
+    for Y in xrange(Height):
+        for X in xrange(Width):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
 
             grey = (Red + Green + Blue)/3
 
-            pxarray[y, X] = (grey, grey, grey)
-            X = X + 1
-        y = y + 1
+            PXArray[X, Y] = (grey, grey, grey)
 
     pygame.display.update()
 
 #halves all the red values
 def LessRed():
-    y = 0
 
-    for x in xrange(Width):
-        X = 0
-        for x in xrange(Height):
-            RGBint = pxarray[y, X]
-            Blue = RGBint & 255
-            Green = (RGBint >> 8) & 255
-            Red = (RGBint >> 16) & 255
+    for Y in xrange(Height):
+        for X in xrange(Width):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
 
-            pxarray[y, X] = (Red/2, Green, Blue)
-            X = X + 1
-        y = y + 1
+            PXArray[X, Y] = (Red/2, Green, Blue)
 
     pygame.display.update()
 
 def ColourTest():
     ColourChange = 0
     Gradient = 1.25
-    y = 0
-    for x in xrange (Width):
-        X = 0
-        for x in xrange (Height):
-            RGBint = pxarray[y,X]
-            Blue = RGBint & 255
-            Green = (RGBint >> 8) & 255
-            Red = (RGBint >> 16) & 255
+    for X in xrange (Width):
+        for Y in xrange (Height):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
 
             if Red > 25 and Green > 25 and Blue > 25:
                 Red =  0
@@ -97,9 +82,7 @@ def ColourTest():
                 Red =255
                 Green =255 - ColourChange
                 Blue = 255 - ColourChange/2
-            pxarray[y, X] = (Red, Green, Blue)
-            X = X + 1
-        y = y + 1
+            PXArray[X, Y] = (Red, Green, Blue)
         ColourChange = ColourChange + Gradient
         if ColourChange == 255:
             Gradient = -1.25
@@ -107,16 +90,14 @@ def ColourTest():
             Gradient = 1.25
     pygame.display.update()
 
+#Interesting affect
 def HUEHUEHUE():
     ColourChange = 0
-    y = 0
-    for x in xrange (Width):
-        X = 0
-        for x in xrange (Height):
-            RGBint = pxarray[y,X]
-            Blue = RGBint & 255
-            Green = (RGBint >> 8) & 255
-            Red = (RGBint >> 16) & 255
+    for X in xrange (Width):
+        for Y in xrange (Height):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
 
             if Red > 25 and Green > 25 and Blue > 25:
                 ColourChange = ColourChange + 1
@@ -142,23 +123,18 @@ def HUEHUEHUE():
                 Blue = 255
             elif Blue < 0:
                 Blue = 0
-            pxarray[y, X] = (Red, Green, Blue)
-            X = X + 1
-        y = y + 1
+            PXArray[X, Y] = (Red, Green, Blue)
     pygame.display.update()
 
 
-
+#Somehow it makes a wood texture, dont ask how
 def WoodTex():
     ColourChange = 0
-    y = 0
-    for x in xrange (Width):
-        X = 0
-        for x in xrange (Height):
-            RGBint = pxarray[y,X]
-            Blue = RGBint & 255
-            Green = (RGBint >> 8) & 255
-            Red = (RGBint >> 16) & 255
+    for X in xrange (Width):
+        for Y in xrange (Height):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
 
             if Red > 25 and Green > 25 and Blue > 25:
                 ColourChange = ColourChange + 1
@@ -187,22 +163,18 @@ def WoodTex():
                 Blue = 255
             elif Blue < 0:
                 Blue = 0
-            pxarray[y, X] = (Red, Green, Blue)
-            X = X + 1
-        y = y + 1
+            PXArray[X, Y] = (Red, Green, Blue)
+
     pygame.display.update()
 
-
+#2spooky5u white fade ghostly effect
 def Spooky():
     ColourChange = 0
-    y = 0
-    for x in xrange (Width):
-        X = 0
-        for x in xrange (Height):
-            RGBint = pxarray[y,X]
-            Blue = RGBint & 255
-            Green = (RGBint >> 8) & 255
-            Red = (RGBint >> 16) & 255
+    for X in xrange (Width):
+        for Y in xrange (Height):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
 
             if Red > 25 and Green > 25 and Blue > 25:
                 ColourChange = ColourChange + 1
@@ -228,11 +200,11 @@ def Spooky():
                 Blue = 255
             elif Blue < 0:
                 Blue = 0
-            pxarray[y, X] = (Red, Green, Blue)
-            X = X + 1
-        y = y + 1
+            PXArray[X, Y] = (Red, Green, Blue)
+
     pygame.display.update()
 
+#Press the keys and it does stuff
 while Running:
     for event in pygame.event.get():
         if event.type == QUIT:
