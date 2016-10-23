@@ -1,14 +1,14 @@
 import pygame, sys, math
 from pygame.locals import *
 
-#key I, G, R, L, W, S, C, P, Q
+#key I, G, R, L, W, S, C, P, Q, E, K
 
-Picture = pygame.image.load("Parrots.jpeg")
+Picture = pygame.image.load("Parrots.Jpeg")
 
 Running = True
 pygame.init()
 
-Width = 1280  #Change these depending on the picture
+Width = 1280     #Change these depending on the picture
 Height = 720
 
 Screen = pygame.display.set_mode((Width, Height))
@@ -94,7 +94,7 @@ def ColourTest():
             Gradient = 1.25
     pygame.display.update()
 
-#Somehow it makes a wood texture, dont ask how
+#Somehow it makes a wood texture or otherstuff but still looks good, dont ask how
 def WoodTex():
     ColourChange = 0
     for X in xrange (Width):
@@ -183,7 +183,6 @@ def ColourDistanceCheck(Colour1, Colour2, Tolerance):
    else:
        return False
 
-
 #if A pixel is close to input Colour (brown) it will half the red value of that pixel
 def CloseEnough(Colour):
     for Y in range(0, Height):
@@ -196,7 +195,7 @@ def CloseEnough(Colour):
             CurrentColour = (Red, Green, Blue)
             CloseBrown = False
 
-            CloseBrown = ColourDistanceCheck(CurrentColour,Colour, 100)
+            CloseBrown = ColourDistanceCheck(CurrentColour,Colour, 150)
 
             if CloseBrown:
                 PXArray[X, Y] = ((Red / 2), Green, Blue)
@@ -222,9 +221,7 @@ def Posterize(ColourVariance):
             PXArray[X, Y] = (Red, Green, Blue)
     pygame.display.update()
 
-
 #Posterizes each colour, Used in the Posterize function
-
 def ColourPolz(Colour,ColourVariance):
     ColourCounter = 255
     while True:
@@ -236,7 +233,6 @@ def ColourPolz(Colour,ColourVariance):
             ColourCounter = ColourCounter - ColourVariance
 
 #Sepia
-
 def SepiaTint():
     GreyScale()
     for X in xrange (Width):
@@ -260,7 +256,6 @@ def SepiaTint():
     pygame.display.update()
 
 #Detects the edges
-
 def DrawEdges():
     for X in xrange (Width - 1):
         for Y in xrange (Height - 1):
@@ -285,8 +280,81 @@ def DrawEdges():
             PXArray[X, Y] = (Difference, Difference, Difference)
     pygame.display.update()
 
-#Press the keys and it does stuff
+#Draws the edges but in colour
+def DrawOutlineColour():
+    for X in xrange (Width - 1):
+        for Y in xrange (Height - 1):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
 
+            PixelSum = (Red + Green + Blue)
+
+            Red2 = Screen.get_at((X + 1, Y )).r
+            Green2 = Screen.get_at((X + 1, Y )).g
+            Blue2 = Screen.get_at((X + 1, Y)).b
+
+            NextPixelSum = (Red2 + Green2 + Blue2)
+            Difference = NextPixelSum - PixelSum
+
+            if Difference < 0:
+                Difference = Difference * - 1
+            if Difference > 255:
+                Difference = 255
+            Difference = 255 - Difference
+
+            Red = Red + Difference
+            Green = Green + Difference
+            Blue = Blue + Difference
+
+            if Red > 255:
+                Red = 255
+            if Green > 255:
+                Green = 255
+            if Blue > 255:
+                Blue = 255
+
+
+            PXArray[X, Y] = (Red, Green, Blue)
+    pygame.display.update()
+
+#Kinda cell shades it, wip
+def CelShadeSorta():
+    for X in xrange(Width - 1):
+        for Y in xrange(Height - 1):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
+
+            PixelSum = (Red + Green + Blue)
+
+            Red2 = Screen.get_at((X + 1, Y)).r
+            Green2 = Screen.get_at((X + 1, Y)).g
+            Blue2 = Screen.get_at((X + 1, Y)).b
+
+            NextPixelSum = (Red2 + Green2 + Blue2)
+            Difference = NextPixelSum - PixelSum
+
+            if Difference < 0:
+                Difference = Difference * - 1
+            if Difference > 255:
+                Difference = 255
+
+            Red = Red - Difference
+            Green = Green - Difference
+            Blue = Blue - Difference
+
+            if Red < 0:
+                Red = 0
+            if Green < 0:
+                Green = 0
+            if Blue < 0:
+                Blue = 0
+
+            PXArray[X, Y] = (Red, Green, Blue)
+    pygame.display.update()
+
+#Press the keys and it does stuff
 while Running:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -308,11 +376,15 @@ while Running:
         if event.type == KEYDOWN and event.key == K_c:
             CloseEnough(Brown) # Can choose any colour
         if event.type == KEYDOWN and event.key == K_p:
-            Posterize(2)  # Try changing the value to alter the amount of posterization
+            Posterize(3)  # Try changing the value to alter the amount of posterization
         if event.type == KEYDOWN and event.key == K_q:
             SepiaTint()
         if event.type == KEYDOWN and event.key == K_e:
             DrawEdges()
+        if event.type == KEYDOWN and event.key == K_k:
+            DrawOutlineColour()
+        if event.type == KEYDOWN and event.key == K_x:
+            CelShadeSorta()
 pygame.quit()
 sys.exit()
 
