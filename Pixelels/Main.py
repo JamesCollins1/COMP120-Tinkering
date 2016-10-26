@@ -5,20 +5,28 @@ from pygame.locals import *
 #Pretty much most the keyboard now
 #Look at the end to see what key relates to which function
 
-Picture = pygame.image.load("Parrots.jpeg") #Just change the image name to use different images
-
+Picture = pygame.image.load("PhoenixCol.png") #Just change the image name to use different images
+Picture2 = pygame.image.load("GodotCol.png")
 Running = True
 pygame.init()
 
-Width = 1280     #Change these depending on the picture
+PictureScale = 80
+PictureScale2 = PictureScale
+PictureScale3 = 0
+ColourManip = 1
+Width = 1280   #Change these depending on the picture
 Height = 720
 
 Screen = pygame.display.set_mode((Width, Height))
-Picture =pygame.transform.scale(Picture, (Width,Height))   #Scales the picture to fit the screen
+#Picture =pygame.transform.scale(Picture, (Width,Height))   #Scales the picture to fit the screen
+Picture =pygame.transform.scale(Picture, (PictureScale,PictureScale))
+Picture2 =pygame.transform.scale(Picture2, (PictureScale,PictureScale))
 Screen.blit(Picture, (0, 0))
+Screen.blit(Picture2, (PictureScale, 0))
 pygame.display.update()
 
 PXArray = pygame.PixelArray(Screen)
+#PXArray = pygame.PixelArray(Picture)
 
 White = (255, 255, 255)
 Black = (0,0,0)
@@ -68,6 +76,8 @@ def LessRed():
 def ColourTest():
     ColourChange = 0
     Gradient = 1.25
+    GradientChange = Gradient
+    #Gradient = 1.25
     for X in xrange (Width):
         for Y in xrange (Height):
             Red = Screen.get_at((X, Y)).r
@@ -75,19 +85,19 @@ def ColourTest():
             Blue = Screen.get_at((X, Y)).b
 
             if Red > 25 and Green > 25 and Blue > 25:
-                Red =  0
-                Green = ColourChange
+                Red =  ColourChange/2
+                Green = ColourChange/2
                 Blue =  ColourChange/2
             else:
-                Red =255
-                Green =255 - ColourChange
-                Blue = 255 - ColourChange/2
+                Red = ColourChange
+                Green = ColourChange
+                Blue = ColourChange
             PXArray[X, Y] = (Red, Green, Blue)
         ColourChange = ColourChange + Gradient
         if ColourChange == 255:
-            Gradient = -1.25
+            Gradient = -GradientChange
         elif ColourChange == 0:
-            Gradient = 1.25
+            Gradient = GradientChange
 
 #Somehow it makes a wood texture or otherstuff but still looks good, dont ask how
 def WoodTex():
@@ -411,6 +421,31 @@ def RainbowMatrixStyleZ():
                 else:
                     ColourNotFound = False
 
+def Mirrors():
+    MirrorPoint = Width/2
+    for Y in xrange(Height):
+        for X in xrange(MirrorPoint):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
+            PXArray[Width - X - 1, Y] = (Red, Green, Blue)
+
+
+#Makes a Collage
+def PhoenixCol(PictureScale2):
+    TargetX=0
+
+    for X in xrange(PictureScale*2):
+        TargetY = 0
+        for Y in xrange(PictureScale):
+            Red = Screen.get_at((X, Y)).r
+            Green = Screen.get_at((X, Y)).g
+            Blue = Screen.get_at((X, Y)).b
+            PXArray[TargetX + (PictureScale2 * 2), TargetY + PictureScale3] = (Red - Red/ColourManip, Green, Blue/ColourManip)
+            TargetY = TargetY + 1
+        TargetX = TargetX + 1
+    PictureScale2 = PictureScale2 + PictureScale
+    return PictureScale2
 #Press the keys and it does stuff
 while Running:
     for event in pygame.event.get():
@@ -433,7 +468,7 @@ while Running:
         if event.type == KEYDOWN and event.key == K_c:
             CloseEnough(Brown) # Can choose any colour using RGB value
         if event.type == KEYDOWN and event.key == K_p:
-            Posterize(3)  # Try changing the value to alter the amount of posterization
+            Posterize(10)  # Try changing the value to alter the amount of posterization
         if event.type == KEYDOWN and event.key == K_q:
             SepiaTint()
         if event.type == KEYDOWN and event.key == K_e:
@@ -448,6 +483,18 @@ while Running:
             RainbowMatrixStyleFill()
         if event.type == KEYDOWN and event.key == K_z:
             RainbowMatrixStyleZ()
+        if event.type == KEYDOWN and event.key == K_n:
+            Mirrors()
+        if event.type == KEYDOWN and event.key == K_b:
+            while PictureScale3 != Height:
+                PictureScale2 = PhoenixCol(PictureScale2)
+                pygame.display.update()
+                if PictureScale2 == Width/2:
+                    PictureScale2 = 0
+                    PictureScale3 = PictureScale3 + PictureScale
+                    ColourManip = ColourManip + 0.2
+                    print ColourManip
+                    print PictureScale3
         pygame.display.update()
 pygame.quit()
 sys.exit()
